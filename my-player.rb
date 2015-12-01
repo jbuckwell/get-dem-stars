@@ -1,9 +1,8 @@
 class MyPlayer
    attr_reader :vel_x, :vel_y, :angle
    def initialize
-    @image = Gosu::Image.new("media/player.bmp")
+    @image = Gosu::Image.new("media/cube.bmp")
     @beep = Gosu::Sample.new("media/beep.wav")
-    #@thrust = Gosu::Sample.new("media/thrusters.wav")
     @x = @y = @vel_x = @vel_y = @angle = 0.0
     @score = 0
   end
@@ -12,29 +11,41 @@ class MyPlayer
     @x, @y = x, y
   end
 
-  def turn_left
-    @angle -= 4.5
+  def up
+    if @y < 90
+	   @y += 0.0
+	else
+       @y -= 4.5
+	end
   end
 
-  def turn_right
-    @angle += 4.5
+  def down
+    if @y > 620
+	   @y -= 0.0
+	else
+       @y += 4.5
+	end
+  end	
+  
+  def left
+    if @x < 100
+	   @x += 0.0
+	else
+       @x -= 4.5
+	 end
+  end  
+  
+  def right
+    if @x > 700
+	   @x -= 0.0
+	else
+       @x += 4.5
+	end
   end
 
   def accelerate
     @vel_x += Gosu::offset_x(@angle, 0.5)
     @vel_y += Gosu::offset_y(@angle, 0.5)
-  end
-
-  def move
-    @x += @vel_x
-    @y += @vel_y
-    @x %= 640
-    @y %= 480
-
-    @vel_x *= 0.95
-    @vel_y *= 0.95
-
-    #@thrust.play
   end
 
   def draw
@@ -44,7 +55,7 @@ class MyPlayer
   def score
     @score
   end
-
+  
   def collect_stars(stars)
     if stars.reject! { |star| Gosu::distance(@x,
                                              @y, 

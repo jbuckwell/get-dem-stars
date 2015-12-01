@@ -1,0 +1,44 @@
+{ "height":40,
+ "layers":[
+        {
+         "compression":"zlib",
+         "data":"eJztlDEOgDAMA5tH8ARewP\/\/hpA6IBTUIbFshIcbsp3qU2OMsd0IsdvUuN5zn4To\/fRls3pPVTdFv2xvNu4P46bol+3Nxv1h3BT9sr3Z\/K2\/4wWV\/pB+Hf11+iH66\/b70r7+\/\/j9od9Qyc\/91XF\/GDdFv2xvNu4P46bol+3NZtWf0m1qZHsr3Sd\/LzUt",
+         "encoding":"base64",
+         "height":40,
+         "name":"Tile Layer 1",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":40,
+         "x":0,
+         "y":0
+        }],
+ "nextobjectid":1,
+ "orientation":"orthogonal",
+ "properties":
+    {
+
+    },
+ "renderorder":"right-down",
+ "tileheight":20,
+ "tilesets":[
+        {
+         "firstgid":1,
+         "image":"..\/..\/..\/..\/..\/..\/..\/Program Files (x86)\/Tiled\/util\/java\/libtiled-java\/test\/tiled\/io\/resources\/cvsmap_tileset.png",
+         "imageheight":512,
+         "imagewidth":512,
+         "margin":0,
+         "name":"UHMcx",
+         "properties":
+            {
+
+            },
+         "spacing":0,
+         "tilecount":256,
+         "tileheight":32,
+         "tilewidth":32
+        }],
+ "tilewidth":20,
+ "version":1,
+ "width":40
+}
