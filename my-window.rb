@@ -20,8 +20,6 @@ class MyWindow < Gosu::Window
 	@player = MyAnimal.new("dog")
     @player.warp(HEIGHT/ 2, WIDTH/ 2)
 	
-	#@x = @y = 20
-	
 	@npc = MyAnimal.new("dog2")
 	@npc.warp((rand * 600) + 100, (rand * 600) + 100)
 	
@@ -39,27 +37,17 @@ class MyWindow < Gosu::Window
 
   def update
     @moving = false
-    player_movement
-	ai_seek unless @stars.empty?
-
-	@timer.update
-	if @timer.time >= 60 
-	  #check whether score is one of the top 5
-	  #if yes, write score to yaml file
-	  close
-	  puts "Your score was #{@player.score}"
-	  puts "Your opponents score was #{@npc.score}"
-	  if @player.score > @npc.score
-	    puts "Congratulations you won!"
-	  else
-	    puts "You lost smelly"
-	  end
-	end
 	
-    @player.collect_stars(@stars)
-	@npc.collect_stars(@stars)
+	unless @timer.time >= 60
+	   @timer.update
+	   @player.collect_stars(@stars)
+	   @npc.collect_stars(@stars)
+	   player_movement
+	 end
+	 
+	ai_seek unless @stars.empty? || @timer.time >= 60
 
-    if rand(100) < 4 and @stars.size < 25 then
+    if rand(100) < 4 and @stars.size < 25 || @timer.time <= 60
       @stars.push(MyStar.new(@stars_anim))
     end
   end
@@ -83,6 +71,67 @@ class MyWindow < Gosu::Window
     1.0,
     1.0,
     0xff_ffff00)
+	
+	game_over
+  end
+  
+  def restart
+    @timer = MyTimer.new 
+	@player = MyAnimal.new("dog")
+	@player.warp(HEIGHT/ 2, WIDTH/ 2)
+	@npc = MyAnimal.new("dog2")
+	@npc.warp((rand * 600) + 100, (rand * 600) + 100)
+	@stars = Array.new
+  end
+  
+  def game_over
+    if @timer.time >= 60 
+	  #check whether score is one of the top 5
+	  #if yes, write score to yaml file
+	  #post/ get request to a webserver using RESTful API
+	  @font.draw("Your score was #{@player.score}",
+	                              (WIDTH/ 2) - 100, 
+										 HEIGHT/ 2,
+										ZOrder::UI,
+                                               1.0,
+                                               1.0,
+                                       0xff_ffff00)
+									   
+	  @font.draw("Your opponents score was #{@npc.score}",
+	                                     (WIDTH/ 2) - 100, 
+										 (HEIGHT/ 2) + 20,
+										       ZOrder::UI,
+                                                      1.0,
+                                                      1.0,
+                                              0xff_ffff00)
+	  
+	  if @player.score > @npc.score
+	    Gosu::Font.new(40).draw("Congratulations you won!",
+		                                  (WIDTH/ 2) - 100, 
+										  (HEIGHT/ 2) + 60,
+										        ZOrder::UI,
+                                                       1.0,
+                                                       1.0,
+                                               0xff_ffff00)
+	  else
+	    Gosu::Font.new(40).draw("You lost smelly", 
+		                         (WIDTH/ 2) - 100,
+								 (HEIGHT/ 2) + 60,
+									   ZOrder::UI,
+                                              1.0,
+                                              1.0,
+                                      0xff_ffff00)
+	  end
+	  @font.draw("Press Enter to start again or ESC to exit", 
+	                                        (WIDTH/ 2) - 100, 
+										   (HEIGHT/ 2) + 100,
+										          ZOrder::UI,
+                                                         1.0,
+                                                         1.0,
+                                                 0xff_ffff00)
+												 
+	   restart if Gosu::button_down? Gosu::KbReturn
+	end
   end
   
   def button_down(id)
@@ -95,15 +144,41 @@ class MyWindow < Gosu::Window
   
   def ai_seek
     if @stars[0].y >= @npc.y
+	   @moving = true
        @npc.down
+	   @npc.direction = "down"
     else
+	   @moving = true
        @npc.up
+	   @npc.direction = "up"
     end
     if @stars[0].x >= @npc.x
+	   @moving = true
        @npc.right
+	   @npc.direction = "right"
     else
+	   @moving = true
        @npc.left
+	   @npc.direction = "left"
     end
+	stopped?(@npc)
+  end
+  
+  def stopped?(character)
+    if @moving == false
+	  if  character.direction == "left"
+	    character.direction = "stoppped_left"
+		
+	  elsif character.direction == "right"
+	    character.direction = "stopped_right"
+		
+	  elsif character.direction == "up"
+	    character.direction = "stopped_up"
+		
+	  elsif character.direction == "down"
+	    character.direction = "stopped_down"
+	  end
+	end
   end
   
   def player_movement
@@ -130,20 +205,6 @@ class MyWindow < Gosu::Window
 	  @player.down
 	  @player.direction = "down"
 	end
-	
-	if @moving == false
-	  if  @player.direction == "left"
-	    @player.direction = "stoppped_left"
-		
-	  elsif @player.direction == "right"
-	    @player.direction = "stopped_right"
-		
-	  elsif @player.direction == "up"
-	    @player.direction = "stopped_up"
-		
-	  elsif @player.direction == "down"
-	    @player.direction = "stopped_down"
-	  end
-	end
+	stopped?(@player)
   end
 end
