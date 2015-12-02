@@ -1,0 +1,17 @@
+pkg
+*.swp
+*.swo
+*.log
+.DS_Store
+.yardoc
+tmp
+tags
+ctags
+.bundle
+.idea/
+doc/
+test_output
+test_project/test_app.exe
+Gemfile.lock
+wrappers/*.tar.gz
+wrappers/*.7z
