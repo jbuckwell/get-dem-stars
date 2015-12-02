@@ -1,8 +1,8 @@
 class MyPlayer
    attr_reader :vel_x, :vel_y, :angle
    def initialize
-    @image = Gosu::Image.new("media/cube.bmp")
-    @beep = Gosu::Sample.new("media/beep.wav")
+    @image = Gosu::Image.new("data/img/cube.bmp")
+    @beep = Gosu::Sample.new("data/beep.wav")
     @x = @y = @vel_x = @vel_y = @angle = 0.0
     @score = 0
   end

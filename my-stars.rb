@@ -5,7 +5,7 @@ module ZOrder
 end
 
 class MyStar
-  attr_reader :x, :y
+  attr_accessor :x, :y
 
   def initialize(animation)
     @animation = animation
@@ -14,7 +14,7 @@ class MyStar
     @color.green = rand(256 - 40) + 40
     @color.blue = rand(256 - 40) + 40
     @x = (rand * 600) + 100
-    @y = (rand * 450) + 100
+    @y = (rand * 600) + 100
   end
 
   def draw
