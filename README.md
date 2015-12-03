@@ -1,3 +1,6 @@
-#This is a personal project
+#Get Dem Stars!
 
-##I will be designing a simple game using the Gosu gem
+##This is a simple game I built using the Gosu gem
+
+###To Install
+Using Bundler: Type `bundle install` to recieve all dependancies
