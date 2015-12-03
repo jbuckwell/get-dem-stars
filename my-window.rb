@@ -1,6 +1,5 @@
 require 'gosu'
 require 'minigl'
-#require './my-player'
 require './my-animal'
 require './my-stars'
 require './my-timer'
@@ -10,17 +9,19 @@ class MyWindow < Gosu::Window
   WIDTH = 800
   HEIGHT = 800
   
+  ANIMALS = ["dog","dog2","cat","cat2"]
+  MAPS = ["map1","map2","map3"]
+  
   attr_accessor :moving
   def initialize
     super HEIGHT, WIDTH
     self.caption = "Get Dem Stars!"
     
-    @background_image = Gosu::Image.new("data/img/map1.png", :tileable => true)    
-    #@player = MyPlayer.new
-	@player = MyAnimal.new("dog")
+    @background_image = Gosu::Image.new("data/img/maps/#{MAPS.sample}.png", :tileable => true)    
+	@player = MyAnimal.new("dude")
     @player.warp(HEIGHT/ 2, WIDTH/ 2)
 	
-	@npc = MyAnimal.new("dog2")
+	@npc = MyAnimal.new(ANIMALS.sample)
 	@npc.warp((rand * 600) + 100, (rand * 600) + 100)
 	
 	@moving = false
@@ -77,11 +78,12 @@ class MyWindow < Gosu::Window
   
   def restart
     @timer = MyTimer.new 
-	@player = MyAnimal.new("dog")
+	@player = MyAnimal.new("dude")
 	@player.warp(HEIGHT/ 2, WIDTH/ 2)
-	@npc = MyAnimal.new("dog2")
+	@npc = MyAnimal.new(ANIMALS.sample)
 	@npc.warp((rand * 600) + 100, (rand * 600) + 100)
 	@stars = Array.new
+	@background_image = Gosu::Image.new("data/img/maps/#{MAPS.sample}.png", :tileable => true)
   end
   
   def game_over
@@ -89,6 +91,7 @@ class MyWindow < Gosu::Window
 	  #check whether score is one of the top 5
 	  #if yes, write score to yaml file
 	  #post/ get request to a webserver using RESTful API
+	  #HTTParty?
 	  @font.draw("Your score was #{@player.score}",
 	                              (WIDTH/ 2) - 100, 
 										 HEIGHT/ 2,
@@ -114,7 +117,7 @@ class MyWindow < Gosu::Window
                                                        1.0,
                                                0xff_ffff00)
 	  else
-	    Gosu::Font.new(40).draw("You lost smelly", 
+	    Gosu::Font.new(40).draw("You lose! Good day sir!", 
 		                         (WIDTH/ 2) - 100,
 								 (HEIGHT/ 2) + 60,
 									   ZOrder::UI,

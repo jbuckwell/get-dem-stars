@@ -1,8 +1,8 @@
 class MyAnimal
-   attr_reader :vel_x, :vel_y, :angle, :compass
+   attr_reader :vel_x, :vel_y, :angle
    attr_accessor :direction, :x, :y
    def initialize(animal)
-    @image = Gosu::Image.load_tiles("data/img/#{animal}.bmp", 32, 32)
+    @image = Gosu::Image.load_tiles("data/img/animals/#{animal}.bmp", 32, 32)
 	@anim_up = @image[9..11]
 	@anim_left = @image[3..5]
 	@anim_right = @image[6..8]
@@ -11,7 +11,6 @@ class MyAnimal
     @x = @y = @vel_x = @vel_y = @angle = 0.0
     @score = 0
 	@direction = "down"
-	@compass = ["up", "down", "left", "right"]
   end
 
   def warp(x,y)
@@ -22,8 +21,8 @@ class MyAnimal
     if @y < 65
 	   @y += 0.0
 	else
-       @y -= 4.5
-	   @vel_y = -4.5
+       @y -= 3.0
+	   @vel_y = -3.0
 	end
   end
 
@@ -31,8 +30,8 @@ class MyAnimal
     if @y > 670
 	   @y -= 0.0
 	else
-       @y += 4.5
-	   @vel_y = 4.5
+       @y += 3.0
+	   @vel_y = 3.0
 	end
   end	
   
