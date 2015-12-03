@@ -3,13 +3,14 @@ require 'minigl'
 require './my-animal'
 require './my-stars'
 require './my-timer'
+require './my-blocker'
 
 class MyWindow < Gosu::Window
 
   WIDTH = 800
   HEIGHT = 800
   
-  ANIMALS = ["dog","dog2","cat","cat2"]
+  ANIMALS = ["dog","dog2","dog3","cat","cat2","cat3"]
   MAPS = ["map1","map2","map3"]
   
   attr_accessor :moving
@@ -20,9 +21,14 @@ class MyWindow < Gosu::Window
     @background_image = Gosu::Image.new("data/img/maps/#{MAPS.sample}.png", :tileable => true)    
 	@player = MyAnimal.new("dude")
     @player.warp(HEIGHT/ 2, WIDTH/ 2)
-	
 	@npc = MyAnimal.new(ANIMALS.sample)
 	@npc.warp((rand * 600) + 100, (rand * 600) + 100)
+	
+	@blockers = Array.new
+	rand(1..5).times { @blockers.push(MyBlocker.new("tree")) }
+	@blockers.each do |blocker| 
+	  blocker.warp((rand * 600) + 100, (rand * 600) + 100)
+	end
 	
 	@moving = false
 	
@@ -44,19 +50,19 @@ class MyWindow < Gosu::Window
 	   @player.collect_stars(@stars)
 	   @npc.collect_stars(@stars)
 	   player_movement
-	 end
-	 
+	   
+	   if rand(100) < 4 and @stars.size < 25
+         @stars.push(MyStar.new(@stars_anim))
+       end
+    end	 
 	ai_seek unless @stars.empty? || @timer.time >= 60
-
-    if rand(100) < 4 and @stars.size < 25 || @timer.time <= 60
-      @stars.push(MyStar.new(@stars_anim))
-    end
   end
 
   def draw
     @background_image.draw(0, 0, ZOrder::Background)
     @player.draw
 	@npc.draw
+	@blockers.each { |blocker| blocker.draw }
     @stars.each { |star| star.draw }
     @font.draw("Stars Ye Have: #{@player.score}   Time Remaining: #{60 - @timer.time}",
                                               10,
@@ -78,12 +84,21 @@ class MyWindow < Gosu::Window
   
   def restart
     @timer = MyTimer.new 
+	
 	@player = MyAnimal.new("dude")
 	@player.warp(HEIGHT/ 2, WIDTH/ 2)
+	
 	@npc = MyAnimal.new(ANIMALS.sample)
 	@npc.warp((rand * 600) + 100, (rand * 600) + 100)
+	
 	@stars = Array.new
 	@background_image = Gosu::Image.new("data/img/maps/#{MAPS.sample}.png", :tileable => true)
+	
+	@blockers = Array.new
+	rand(1..5).times { @blockers.push(MyBlocker.new("tree")) }
+	@blockers.each do |blocker| 
+	  blocker.warp((rand * 600) + 100, (rand * 600) + 100)
+	end
   end
   
   def game_over
@@ -116,6 +131,7 @@ class MyWindow < Gosu::Window
                                                        1.0,
                                                        1.0,
                                                0xff_ffff00)
+		
 	  else
 	    Gosu::Font.new(40).draw("You lose! Good day sir!", 
 		                         (WIDTH/ 2) - 100,

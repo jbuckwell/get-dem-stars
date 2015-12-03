@@ -1,0 +1,2 @@
+cd ..
+ruby application.rb

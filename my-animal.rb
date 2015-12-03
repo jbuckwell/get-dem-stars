@@ -71,10 +71,18 @@ class MyAnimal
                                              @y, 
                                              star.x,
                                              star.y) < 30 }
-    then
       @score += 1
       @beep.play 
     end
+  end
+  
+  def collide(blockers)
+    if blockers.each { |blocker| Gosu::distance(@x,
+												@y,
+												blocker.x,
+												blocker.y) < 10 }
+	  @score += 1
+	end
   end
   
   private

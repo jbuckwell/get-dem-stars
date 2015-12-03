@@ -1,7 +1,7 @@
 class MyBlocker
    attr_accessor :x, :y
    def initialize(object)
-    @image = Gosu::Image.new("data/img/#{object}.bmp")]
+    @image = Gosu::Image.new("data/img/#{object}.bmp")
     @x = @y = 0.0
   end
 
@@ -10,7 +10,7 @@ class MyBlocker
   end
   
   def draw
-  
+    @image.draw(@x,@y,1)
   end
   
   def collect_stars(stars)
