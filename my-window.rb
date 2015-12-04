@@ -1,5 +1,7 @@
 require 'gosu'
 require 'minigl'
+require 'net/http'
+require 'uri'
 require './my-animal'
 require './my-stars'
 require './my-timer'
@@ -7,6 +9,7 @@ require './my-blocker'
 
 class MyWindow < Gosu::Window
 
+  NAME = ARGV[0] || "Chicken Chaser"
   WIDTH = 800
   HEIGHT = 800
   
@@ -21,6 +24,9 @@ class MyWindow < Gosu::Window
     @background_image = Gosu::Image.new("data/img/maps/#{MAPS.sample}.png", :tileable => true)    
 	@player = MyAnimal.new("dude")
     @player.warp(HEIGHT/ 2, WIDTH/ 2)
+	
+	@total_score = 0
+	
 	@npc = MyAnimal.new(ANIMALS.sample)
 	@npc.warp((rand * 600) + 100, (rand * 600) + 100)
 	
@@ -29,6 +35,8 @@ class MyWindow < Gosu::Window
 	@blockers.each do |blocker| 
 	  blocker.warp((rand * 600) + 100, (rand * 600) + 100)
 	end
+	
+	@level = 1
 	
 	@moving = false
 	
@@ -40,6 +48,9 @@ class MyWindow < Gosu::Window
     @stars = Array.new
 
     @font = Gosu::Font.new(20)
+	
+	@name = NAME
+    @uri = URI.parse("users.darkone.co.uk/~omnicomplacent/GetDemStars/scores")
   end
 
   def update
@@ -64,7 +75,7 @@ class MyWindow < Gosu::Window
 	@npc.draw
 	@blockers.each { |blocker| blocker.draw }
     @stars.each { |star| star.draw }
-    @font.draw("Stars Ye Have: #{@player.score}   Time Remaining: #{60 - @timer.time}",
+    @font.draw("Stars This Round: #{@player.score}  Total Stars: #{@player.score + @total_score}  Time Remaining: #{60 - @timer.time}",
                                               10,
                                               10,
                                               ZOrder::UI,
@@ -85,11 +96,22 @@ class MyWindow < Gosu::Window
   def restart
     @timer = MyTimer.new 
 	
-	@player = MyAnimal.new("dude")
-	@player.warp(HEIGHT/ 2, WIDTH/ 2)
-	
 	@npc = MyAnimal.new(ANIMALS.sample)
 	@npc.warp((rand * 600) + 100, (rand * 600) + 100)
+	if @player.score <= @npc.score
+	   @level = 1
+	   @total_score = 0
+	   @npc.vel_x = 4.5
+	   @npc.vel_y = 3.0
+	else
+	   @total_score += @player.score
+	   @level += 1
+	   @npc.vel_x += @level * 0.2
+	   @npc.vel_y += @level * 0.2
+	end
+	
+	@player = MyAnimal.new("dude")
+	@player.warp(HEIGHT/ 2, WIDTH/ 2)
 	
 	@stars = Array.new
 	@background_image = Gosu::Image.new("data/img/maps/#{MAPS.sample}.png", :tileable => true)
@@ -107,8 +129,8 @@ class MyWindow < Gosu::Window
 	  #if yes, write score to yaml file
 	  #post/ get request to a webserver using RESTful API
 	  #HTTParty?
-	  @font.draw("Your score was #{@player.score}",
-	                              (WIDTH/ 2) - 100, 
+	  @font.draw("#{@name}, your score is #{@player.score + @total_score}",
+	                              (WIDTH/ 2) - 200, 
 										 HEIGHT/ 2,
 										ZOrder::UI,
                                                1.0,
@@ -116,7 +138,7 @@ class MyWindow < Gosu::Window
                                        0xff_ffff00)
 									   
 	  @font.draw("Your opponents score was #{@npc.score}",
-	                                     (WIDTH/ 2) - 100, 
+	                                     (WIDTH/ 2) - 200, 
 										 (HEIGHT/ 2) + 20,
 										       ZOrder::UI,
                                                       1.0,
@@ -125,24 +147,32 @@ class MyWindow < Gosu::Window
 	  
 	  if @player.score > @npc.score
 	    Gosu::Font.new(40).draw("Congratulations you won!",
-		                                  (WIDTH/ 2) - 100, 
-										  (HEIGHT/ 2) + 60,
+		                                  (WIDTH/ 2) - 200, 
+										  (HEIGHT/ 2) + 40,
 										        ZOrder::UI,
                                                        1.0,
                                                        1.0,
                                                0xff_ffff00)
-		
 	  else
 	    Gosu::Font.new(40).draw("You lose! Good day sir!", 
-		                         (WIDTH/ 2) - 100,
-								 (HEIGHT/ 2) + 60,
+		                         (WIDTH/ 2) - 200,
+								 (HEIGHT/ 2) + 40,
 									   ZOrder::UI,
                                               1.0,
                                               1.0,
                                       0xff_ffff00)
+									  
+		Gosu::Font.new(20).draw("Press U to upload score", 
+		                         (WIDTH/ 2) - 200,
+								 (HEIGHT/ 2) + 80,
+									   ZOrder::UI,
+                                              1.0,
+                                              1.0,
+                                      0xff_ffff00)
+		post_scores if Gosu::button_down? Gosu::KbU
 	  end
 	  @font.draw("Press Enter to start again or ESC to exit", 
-	                                        (WIDTH/ 2) - 100, 
+	                                        (WIDTH/ 2) - 200, 
 										   (HEIGHT/ 2) + 100,
 										          ZOrder::UI,
                                                          1.0,
@@ -160,6 +190,10 @@ class MyWindow < Gosu::Window
   end
   
   private
+  
+  def post_scores
+    Net::HTTP.post_form(@uri, {'name' => @name, 'score' => @total_score } )
+  end
   
   def ai_seek
     if @stars[0].y >= @npc.y

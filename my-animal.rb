@@ -1,6 +1,5 @@
 class MyAnimal
-   attr_reader :vel_x, :vel_y, :angle
-   attr_accessor :direction, :x, :y
+   attr_accessor :direction, :x, :y, :vel_x, :vel_y
    def initialize(animal)
     @image = Gosu::Image.load_tiles("data/img/animals/#{animal}.bmp", 32, 32)
 	@anim_up = @image[9..11]
@@ -8,8 +7,10 @@ class MyAnimal
 	@anim_right = @image[6..8]
 	@anim_down = @image[0..2]
 	@beep = Gosu::Sample.new("data/beep.wav")
-    @x = @y = @vel_x = @vel_y = @angle = 0.0
-    @score = 0
+    @x = @y = 0.0 
+	@vel_x = 4.5
+	@vel_y = 3.0
+	@score = 0
 	@direction = "down"
   end
 
@@ -21,8 +22,7 @@ class MyAnimal
     if @y < 65
 	   @y += 0.0
 	else
-       @y -= 3.0
-	   @vel_y = -3.0
+       @y -= @vel_y
 	end
   end
 
@@ -30,8 +30,7 @@ class MyAnimal
     if @y > 670
 	   @y -= 0.0
 	else
-       @y += 3.0
-	   @vel_y = 3.0
+       @y += @vel_y
 	end
   end	
   
@@ -39,8 +38,7 @@ class MyAnimal
     if @x < 80
 	   @x += 0.0
 	else
-       @x -= 4.5
-	   @vel_x = -4.5
+       @x -= @vel_x
 	 end
   end  
   
@@ -48,8 +46,7 @@ class MyAnimal
     if @x > 690
 	   @x -= 0.0
 	else
-       @x += 4.5
-	   @vel_x = 4.5
+       @x += @vel_x
 	end
   end
 
