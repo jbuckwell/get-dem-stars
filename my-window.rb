@@ -1,5 +1,6 @@
 require 'gosu'
 require 'minigl'
+require 'httparty'
 require 'net/http'
 require 'uri'
 require './my-animal'
@@ -38,19 +39,24 @@ class MyWindow < Gosu::Window
 	
 	@level = 1
 	
-	@moving = false
+	@thing_anim = Gosu::Image::load_tiles("data/img/thing.bmp",
+														    25,
+														    25)
+	@star_anim = Gosu::Image::load_tiles("data/img/star.png",
+														    25,
+														    25)
+	@things = [@thing_anim, @star_anim]
 	
+	@moving = false
 	@timer = MyTimer.new 
-
-    @stars_anim = Gosu::Image::load_tiles("data/img/star.png",
-                                          25,
-                                          25)
     @stars = Array.new
 
     @font = Gosu::Font.new(20)
+	@font_big = Gosu::Font.new(40)
 	
 	@name = NAME
-    @uri = URI.parse("users.darkone.co.uk/~omnicomplacent/GetDemStars/scores")
+	
+    @uri = URI("users.darkone.co.uk/~omnicomplacent/GetDemStars/scores.asp")
   end
 
   def update
@@ -59,11 +65,13 @@ class MyWindow < Gosu::Window
 	unless @timer.time >= 60
 	   @timer.update
 	   @player.collect_stars(@stars)
+	   @player.collide(@blockers)
 	   @npc.collect_stars(@stars)
+	   @blockers.each { |blocker| blocker.collect_stars(@stars) }
 	   player_movement
 	   
 	   if rand(100) < 4 and @stars.size < 25
-         @stars.push(MyStar.new(@stars_anim))
+         @stars.push(MyStar.new(@things.sample))
        end
     end	 
 	ai_seek unless @stars.empty? || @timer.time >= 60
@@ -146,7 +154,7 @@ class MyWindow < Gosu::Window
                                               0xff_ffff00)
 	  
 	  if @player.score > @npc.score
-	    Gosu::Font.new(40).draw("Congratulations you won!",
+	     @font_big.draw("Congratulations you won!",
 		                                  (WIDTH/ 2) - 200, 
 										  (HEIGHT/ 2) + 40,
 										        ZOrder::UI,
@@ -154,7 +162,7 @@ class MyWindow < Gosu::Window
                                                        1.0,
                                                0xff_ffff00)
 	  else
-	    Gosu::Font.new(40).draw("You lose! Good day sir!", 
+	    @font_big.draw("You lose! Good day sir!", 
 		                         (WIDTH/ 2) - 200,
 								 (HEIGHT/ 2) + 40,
 									   ZOrder::UI,
@@ -162,7 +170,7 @@ class MyWindow < Gosu::Window
                                               1.0,
                                       0xff_ffff00)
 									  
-		Gosu::Font.new(20).draw("Press U to upload score", 
+		@font.draw("Press U to upload score", 
 		                         (WIDTH/ 2) - 200,
 								 (HEIGHT/ 2) + 80,
 									   ZOrder::UI,
@@ -192,7 +200,8 @@ class MyWindow < Gosu::Window
   private
   
   def post_scores
-    Net::HTTP.post_form(@uri, {'name' => @name, 'score' => @total_score } )
+    absolute_score = @total_score + @player.score
+    HTTParty.post(@uri, query: {name: @name, score: @total_score + @player.score} )
   end
   
   def ai_seek

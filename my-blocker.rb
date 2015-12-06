@@ -1,7 +1,7 @@
 class MyBlocker
    attr_accessor :x, :y
    def initialize(object)
-    @image = Gosu::Image.new("data/img/#{object}.bmp")
+    @image = Gosu::Image.new("data/img/#{object}.bmp", :rect => [0,0,96,92])
     @x = @y = 0.0
   end
 

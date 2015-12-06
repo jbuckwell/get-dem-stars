@@ -78,7 +78,6 @@ class MyAnimal
 												@y,
 												blocker.x,
 												blocker.y) < 10 }
-	  @score += 1
 	end
   end
   
