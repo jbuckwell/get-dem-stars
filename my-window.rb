@@ -1,5 +1,4 @@
 require 'gosu'
-require 'minigl'
 require 'httparty'
 require 'net/http'
 require 'uri'
@@ -13,7 +12,6 @@ class MyWindow < Gosu::Window
   NAME = ARGV[0] || "Chicken Chaser"
   WIDTH = 800
   HEIGHT = 800
-  
   ANIMALS = ["dog","dog2","dog3","cat","cat2","cat3"]
   MAPS = ["map1","map2","map3"]
   
@@ -56,7 +54,7 @@ class MyWindow < Gosu::Window
 	
 	@name = NAME
 	
-    @uri = URI("users.darkone.co.uk/~omnicomplacent/GetDemStars/scores.asp")
+    @uri = URI('users.darkone.co.uk/~omnicomplacent/GetDemStars/scores')
   end
 
   def update
@@ -200,8 +198,9 @@ class MyWindow < Gosu::Window
   private
   
   def post_scores
-    absolute_score = @total_score + @player.score
-    HTTParty.post(@uri, query: {name: @name, score: @total_score + @player.score} )
+    absolute_score = (@total_score + @player.score).to_s
+    data = Net::HTTP.post_form(@uri, {'name' => @name, 'score' => absolute_score}) 
+    puts data.body
   end
   
   def ai_seek
