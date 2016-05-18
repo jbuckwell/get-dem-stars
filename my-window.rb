@@ -12,9 +12,10 @@ class MyWindow < Gosu::Window
   WIDTH = 800
   HEIGHT = 800
   ANIMALS = ["dog","dog2","dog3","cat","cat2","cat3"]
+	MAPS = ["map1","map2","map3"]
   
   attr_accessor :moving, :total_score
-  def initialize(map, name = "Chicken Chaser")
+  def initialize(map, name)
     super HEIGHT, WIDTH
     self.caption = "Get Dem Stars!"
     
@@ -152,7 +153,7 @@ class MyWindow < Gosu::Window
                                  0xff_ffff00)
 		   post_scores if Gosu::button_down? Gosu::KbU
 	  end
-	  @font.draw("Press Enter to start again or ESC to exit", 
+	  @font.draw("Press S to start again or ESC to exit",
 	                                        (WIDTH/ 2) - 200, 
 										                     (HEIGHT/ 2) + 100,
 										                            ZOrder::UI,
@@ -160,7 +161,7 @@ class MyWindow < Gosu::Window
                                                        1.0,
                                                 0xff_ffff00)
 												 
-	   restart if Gosu::button_down? Gosu::KbReturn
+	   restart if Gosu::button_down? Gosu::KbS
 	  end
   end
   
