@@ -1,3 +1,3 @@
-require './my-window'
+require './my-splashscreen'
 
-MyWindow.new.show
+MySplashScreen.new.show

@@ -1,3 +1,4 @@
 source 'https://rubygems.org'
 
-gem 'gosu', :require => 'gosu'
+gem 'gosu'
+gem 'httparty'

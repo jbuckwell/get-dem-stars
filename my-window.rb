@@ -9,21 +9,22 @@ require './my-blocker'
 
 class MyWindow < Gosu::Window
 
-  NAME = ARGV[0] || "Chicken Chaser"
   WIDTH = 800
   HEIGHT = 800
   ANIMALS = ["dog","dog2","dog3","cat","cat2","cat3"]
-  MAPS = ["map1","map2","map3"]
   
   attr_accessor :moving, :total_score
-  def initialize
+  def initialize(map, name = "Chicken Chaser")
     super HEIGHT, WIDTH
     self.caption = "Get Dem Stars!"
     
-    @background_image = Gosu::Image.new("data/img/maps/#{MAPS.sample}.png", :tileable => true)    
+    @background_image = Gosu::Image.new("data/img/maps/#{map}.png", :tileable => true)
 	  @player = MyAnimal.new("dude")
     @player.warp(HEIGHT/ 2, WIDTH/ 2)
-	
+
+		@map = map
+		@name = name
+
 	  @total_score = 0
 	
 	  @npc = MyAnimal.new(ANIMALS.sample)
@@ -51,8 +52,6 @@ class MyWindow < Gosu::Window
 
     @font = Gosu::Font.new(20)
 	  @font_big = Gosu::Font.new(40)
-	
-	  @name = NAME
 	
     @uri = URI('users.darkone.co.uk/~omnicomplacent/GetDemStars/scores')
   end
@@ -194,7 +193,7 @@ class MyWindow < Gosu::Window
 	    blocker.warp((rand * 600) + 100, (rand * 600) + 100)
 	  end
   end
-  
+
   def button_down(id)
     if id == Gosu::KbEscape
       close
